@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@supabase/auth-helpers-react";
+import { useSession } from "@supabase/auth-helpers-react";
 
 const projectTypes = [
   "Website Development",
@@ -46,7 +46,7 @@ interface NewProjectDialogProps {
 
 export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) {
   const { toast } = useToast();
-  const user = useAuth();
+  const session = useSession();
 
   const form = useForm<ProjectBriefForm>({
     resolver: zodResolver(formSchema),
@@ -61,10 +61,26 @@ export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) 
   });
 
   const onSubmit = async (data: ProjectBriefForm) => {
-    if (!user?.user?.id) {
+    if (!session?.user?.id) {
       toast({
         title: "Error",
         description: "You must be logged in to create a project",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // First, get the user's agency
+    const { data: agencyMember } = await supabase
+      .from('agency_members')
+      .select('agency_id')
+      .eq('user_id', session.user.id)
+      .single();
+
+    if (!agencyMember?.agency_id) {
+      toast({
+        title: "Error",
+        description: "You must be part of an agency to create a project",
         variant: "destructive",
       });
       return;
@@ -74,11 +90,15 @@ export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) 
       name: data.name,
       description: data.description,
       status: "proposal",
-      created_by: user.user.id,
-      // Note: agency_id would need to be set based on the user's context
+      created_by: session.user.id,
+      agency_id: agencyMember.agency_id,
+      client_name: null, // We can add this later if needed
+      start_date: null,
+      completion_date: new Date(data.deadline).toISOString(),
     });
 
     if (error) {
+      console.error('Error creating project:', error);
       toast({
         title: "Error",
         description: "Failed to create project. Please try again.",
