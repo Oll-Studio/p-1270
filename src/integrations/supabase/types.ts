@@ -9,16 +9,94 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      agencies: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      agency_members: {
+        Row: {
+          agency_id: string | null
+          created_at: string
+          id: string
+          invited_by: string | null
+          permission_level: Database["public"]["Enums"]["permission_level"]
+          status: Database["public"]["Enums"]["membership_status"]
+          updated_at: string
+          user_id: string | null
+          user_type: Database["public"]["Enums"]["user_type"]
+        }
+        Insert: {
+          agency_id?: string | null
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          permission_level: Database["public"]["Enums"]["permission_level"]
+          status?: Database["public"]["Enums"]["membership_status"]
+          updated_at?: string
+          user_id?: string | null
+          user_type: Database["public"]["Enums"]["user_type"]
+        }
+        Update: {
+          agency_id?: string | null
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          permission_level?: Database["public"]["Enums"]["permission_level"]
+          status?: Database["public"]["Enums"]["membership_status"]
+          updated_at?: string
+          user_id?: string | null
+          user_type?: Database["public"]["Enums"]["user_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agency_members_agency_id_fkey"
+            columns: ["agency_id"]
+            isOneToOne: false
+            referencedRelation: "agencies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_default_permission_level: {
+        Args: {
+          user_type: Database["public"]["Enums"]["user_type"]
+          requested_level: Database["public"]["Enums"]["permission_level"]
+        }
+        Returns: Database["public"]["Enums"]["permission_level"]
+      }
     }
     Enums: {
-      [_ in never]: never
+      membership_status: "pending" | "approved" | "rejected"
+      permission_level: "admin" | "editor" | "viewer"
+      user_type: "agency" | "client" | "freelance"
     }
     CompositeTypes: {
       [_ in never]: never
