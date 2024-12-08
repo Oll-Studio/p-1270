@@ -14,6 +14,8 @@ import { FileUpload } from "./project-form/FileUpload";
 import { DeadlinePicker } from "./project-form/DeadlinePicker";
 import { BudgetRangeSelect } from "./project-form/BudgetRangeSelect";
 import { projectBriefFormSchema, type ProjectBriefFormValues } from "./project-form/types";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 interface NewProjectDialogProps {
   open: boolean;
@@ -23,6 +25,7 @@ interface NewProjectDialogProps {
 export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) {
   const { toast } = useToast();
   const session = useSession();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<ProjectBriefFormValues>({
     resolver: zodResolver(projectBriefFormSchema),
@@ -39,61 +42,71 @@ export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) 
   });
 
   const onSubmit = async (data: ProjectBriefFormValues) => {
-    if (!session?.user?.id) {
-      toast({
-        title: "Error",
-        description: "You must be logged in to create a project",
-        variant: "destructive",
+    console.log("Form submitted with data:", data);
+    setIsSubmitting(true);
+
+    try {
+      if (!session?.user?.id) {
+        toast({
+          title: "Error",
+          description: "You must be logged in to create a project",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // First, get the user's agency
+      const { data: agencyMember, error: agencyError } = await supabase
+        .from('agency_members')
+        .select('agency_id')
+        .eq('user_id', session.user.id)
+        .single();
+
+      if (agencyError || !agencyMember?.agency_id) {
+        console.error('Error fetching agency:', agencyError);
+        toast({
+          title: "Error",
+          description: "You must be part of an agency to create a project",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error: projectError } = await supabase.from("projects").insert({
+        name: data.name,
+        description: data.description,
+        status: "proposal",
+        created_by: session.user.id,
+        agency_id: agencyMember.agency_id,
+        client_name: null,
+        start_date: null,
+        completion_date: new Date(data.deadline).toISOString(),
+        budget_range: data.budgetRange,
+        proposal_status: "requested",
       });
-      return;
-    }
 
-    // First, get the user's agency
-    const { data: agencyMember } = await supabase
-      .from('agency_members')
-      .select('agency_id')
-      .eq('user_id', session.user.id)
-      .single();
+      if (projectError) {
+        console.error('Error creating project:', projectError);
+        throw projectError;
+      }
 
-    if (!agencyMember?.agency_id) {
       toast({
-        title: "Error",
-        description: "You must be part of an agency to create a project",
-        variant: "destructive",
+        title: "Success",
+        description: "Project brief submitted successfully",
       });
-      return;
-    }
-
-    const { error } = await supabase.from("projects").insert({
-      name: data.name,
-      description: data.description,
-      status: "proposal",
-      created_by: session.user.id,
-      agency_id: agencyMember.agency_id,
-      client_name: null,
-      start_date: null,
-      completion_date: new Date(data.deadline).toISOString(),
-      budget_range: data.budgetRange,
-      proposal_status: "requested",
-    });
-
-    if (error) {
-      console.error('Error creating project:', error);
+      
+      onOpenChange(false);
+      form.reset();
+    } catch (error) {
+      console.error('Error in form submission:', error);
       toast({
         title: "Error",
         description: "Failed to create project. Please try again.",
         variant: "destructive",
       });
-      return;
+    } finally {
+      setIsSubmitting(false);
     }
-
-    toast({
-      title: "Success",
-      description: "Project brief submitted successfully",
-    });
-    
-    onOpenChange(false);
-    form.reset();
   };
 
   return (
@@ -164,10 +177,19 @@ export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) 
             <DeadlinePicker form={form} />
 
             <div className="sticky bottom-0 flex justify-end space-x-2 pt-4 bg-background">
-              <Button variant="outline" onClick={() => onOpenChange(false)}>
+              <Button variant="outline" onClick={() => onOpenChange(false)} type="button">
                 Cancel
               </Button>
-              <Button type="submit">Submit Brief</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  'Submit Brief'
+                )}
+              </Button>
             </div>
           </form>
         </Form>
