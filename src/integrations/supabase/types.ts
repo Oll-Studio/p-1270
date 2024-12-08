@@ -43,6 +43,7 @@ export type Database = {
           id: string
           invited_by: string | null
           permission_level: Database["public"]["Enums"]["permission_level"]
+          role: Database["public"]["Enums"]["permission_level"] | null
           status: Database["public"]["Enums"]["membership_status"]
           updated_at: string
           user_id: string | null
@@ -54,6 +55,7 @@ export type Database = {
           id?: string
           invited_by?: string | null
           permission_level: Database["public"]["Enums"]["permission_level"]
+          role?: Database["public"]["Enums"]["permission_level"] | null
           status?: Database["public"]["Enums"]["membership_status"]
           updated_at?: string
           user_id?: string | null
@@ -65,6 +67,7 @@ export type Database = {
           id?: string
           invited_by?: string | null
           permission_level?: Database["public"]["Enums"]["permission_level"]
+          role?: Database["public"]["Enums"]["permission_level"] | null
           status?: Database["public"]["Enums"]["membership_status"]
           updated_at?: string
           user_id?: string | null
