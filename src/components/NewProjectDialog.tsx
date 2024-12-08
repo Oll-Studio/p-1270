@@ -98,7 +98,7 @@ export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>New Project Brief</DialogTitle>
         </DialogHeader>
@@ -163,7 +163,7 @@ export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) 
             <FileUpload form={form} />
             <DeadlinePicker form={form} />
 
-            <div className="flex justify-end space-x-2">
+            <div className="sticky bottom-0 flex justify-end space-x-2 pt-4 bg-background">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>

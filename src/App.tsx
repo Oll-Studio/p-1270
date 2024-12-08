@@ -15,7 +15,6 @@ import Notifications from "@/pages/Notifications";
 import Transactions from "@/pages/Transactions";
 import Workspaces from "@/pages/Workspaces";
 import Projects from "@/pages/Projects";
-import Users from "@/pages/Users";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -41,7 +40,6 @@ function App() {
                     <Route path="/analytics" element={<Analytics />} />
                     <Route path="/notifications" element={<Notifications />} />
                     <Route path="/transactions" element={<Transactions />} />
-                    <Route path="/users" element={<Users />} />
                   </Routes>
                 </div>
               </main>

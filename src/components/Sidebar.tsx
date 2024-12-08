@@ -1,4 +1,4 @@
-import { Home, PieChart, Settings, User, CreditCard, Bell, Building2, FolderKanban, Users } from "lucide-react";
+import { Home, PieChart, Settings, User, CreditCard, Bell, Building2, FolderKanban } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
 
@@ -6,7 +6,6 @@ const menuItems = [
   { icon: Home, label: "Home", path: "/" },
   { icon: Building2, label: "Workspaces", path: "/workspaces" },
   { icon: FolderKanban, label: "Projects", path: "/projects" },
-  { icon: Users, label: "Users", path: "/users" },
   { icon: PieChart, label: "Analytics", path: "/analytics" },
   { icon: CreditCard, label: "Transactions", path: "/transactions" },
   { icon: Bell, label: "Notifications", path: "/notifications" },

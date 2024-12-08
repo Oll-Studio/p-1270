@@ -92,6 +92,7 @@ export type Database = {
           created_at: string
           created_by: string
           description: string | null
+          feedback: string | null
           id: string
           name: string
           proposal_status: string | null
@@ -107,6 +108,7 @@ export type Database = {
           created_at?: string
           created_by: string
           description?: string | null
+          feedback?: string | null
           id?: string
           name: string
           proposal_status?: string | null
@@ -122,6 +124,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           description?: string | null
+          feedback?: string | null
           id?: string
           name?: string
           proposal_status?: string | null

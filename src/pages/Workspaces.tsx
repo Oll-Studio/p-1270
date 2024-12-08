@@ -3,9 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Inbox, UserPlus, Users } from "lucide-react";
+import { Inbox, UserPlus, Users, Plus } from "lucide-react";
+import { useState } from "react";
+import { CreateAgencyDialog } from "@/components/workspace/CreateAgencyDialog";
+import { AgencyUsersList } from "@/components/workspace/AgencyUsersList";
 
 const Dashboard = () => {
+  const [showCreateAgencyDialog, setShowCreateAgencyDialog] = useState(false);
+  
   // Fetch agencies
   const { data: agencies } = useQuery({
     queryKey: ["agencies"],
@@ -60,33 +65,41 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-8">
-      <header>
-        <h1 className="text-4xl font-bold text-primary">Dashboard</h1>
-        <p className="text-secondary-foreground">Manage your agency memberships</p>
+      <header className="flex justify-between items-center">
+        <div>
+          <h1 className="text-4xl font-bold text-primary">Workspaces</h1>
+          <p className="text-secondary-foreground">Manage your agency memberships</p>
+        </div>
+        <Button onClick={() => setShowCreateAgencyDialog(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          Create Agency
+        </Button>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Available Agencies */}
         <Card className="col-span-3 p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <UserPlus className="h-5 w-5" />
-            <h2 className="text-xl font-semibold">Available Agencies</h2>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <UserPlus className="h-5 w-5" />
+              <h2 className="text-xl font-semibold">Available Agencies</h2>
+            </div>
           </div>
           <div className="space-y-4">
             {agencies?.map((agency) => (
-              <div
-                key={agency.id}
-                className="flex items-center justify-between p-4 bg-muted rounded-lg"
-              >
-                <div>
-                  <h3 className="font-medium">{agency.name}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {agency.description}
-                  </p>
+              <div key={agency.id} className="space-y-6">
+                <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                  <div>
+                    <h3 className="font-medium">{agency.name}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {agency.description}
+                    </p>
+                  </div>
+                  <Button onClick={() => handleJoinRequest(agency.id)}>
+                    Request to Join
+                  </Button>
                 </div>
-                <Button onClick={() => handleJoinRequest(agency.id)}>
-                  Request to Join
-                </Button>
+                <AgencyUsersList agencyId={agency.id} />
               </div>
             ))}
           </div>
@@ -132,6 +145,11 @@ const Dashboard = () => {
           </div>
         </Card>
       </div>
+
+      <CreateAgencyDialog 
+        open={showCreateAgencyDialog} 
+        onOpenChange={setShowCreateAgencyDialog} 
+      />
     </div>
   );
 };
