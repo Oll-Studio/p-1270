@@ -2,9 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { ChartBar, Inbox, Activity, CheckCircle } from "lucide-react";
+import { ChartBar, Inbox, Activity, CheckCircle, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { NewProjectDialog } from "@/components/NewProjectDialog";
+import { useState } from "react";
 
 const Projects = () => {
+  const [showNewProjectDialog, setShowNewProjectDialog] = useState(false);
   const { data: projects } = useQuery({
     queryKey: ["projects"],
     queryFn: async () => {
@@ -73,7 +77,13 @@ const Projects = () => {
 
       {/* Proposal Requests */}
       <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Proposal Requests</h2>
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold">Proposal Requests</h2>
+          <Button onClick={() => setShowNewProjectDialog(true)} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            New Project
+          </Button>
+        </div>
         <Card>
           <Table>
             <TableHeader>
@@ -163,6 +173,10 @@ const Projects = () => {
           </Table>
         </Card>
       </section>
+      <NewProjectDialog 
+        open={showNewProjectDialog} 
+        onOpenChange={setShowNewProjectDialog} 
+      />
     </div>
   );
 };
