@@ -1,110 +1,131 @@
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
-import { DollarSign, PieChart, ArrowUpRight, ArrowDownRight } from "lucide-react";
-import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
-
-const data = [
-  { name: "Jan", value: 2400 },
-  { name: "Feb", value: 1398 },
-  { name: "Mar", value: 9800 },
-  { name: "Apr", value: 3908 },
-  { name: "May", value: 4800 },
-  { name: "Jun", value: 3800 },
-];
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Clock, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Index = () => {
+  const { data: projects, isLoading } = useQuery({
+    queryKey: ["projects"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("projects").select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
+  const urgentProjects = projects?.filter(p => 
+    p.status === "ongoing" && new Date(p.start_date || "") < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+  ) || [];
+
+  const recentProjects = projects?.slice(0, 5) || [];
+  
+  const projectsByStatus = {
+    proposal: projects?.filter(p => p.status === "proposal") || [],
+    ongoing: projects?.filter(p => p.status === "ongoing") || [],
+    finished: projects?.filter(p => p.status === "finished") || [],
+  };
+
   return (
     <div className="space-y-8">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-4xl font-bold text-primary">Good Morning!</h1>
-          <p className="text-secondary-foreground">Welcome back to your financial overview</p>
+          <h1 className="text-4xl font-bold text-primary">Projects Overview</h1>
+          <p className="text-secondary-foreground">A summary of all your projects</p>
         </div>
-        <div className="flex items-center space-x-4">
-          <button className="glass-card px-4 py-2 rounded-lg hover-scale">
-            <DollarSign className="h-5 w-5" />
-          </button>
-        </div>
+        <Button asChild>
+          <Link to="/projects">
+            View All Projects
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="glass-card p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Total Balance</p>
-              <h2 className="text-2xl font-bold">$24,563.00</h2>
-            </div>
-            <div className="p-2 bg-green-100 rounded-full">
-              <ArrowUpRight className="h-4 w-4 text-green-600" />
-            </div>
+        <Card className="p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <AlertCircle className="h-5 w-5 text-yellow-500" />
+            <h2 className="text-xl font-semibold">Proposals</h2>
           </div>
+          <div className="text-3xl font-bold mb-2">{projectsByStatus.proposal.length}</div>
+          <p className="text-sm text-muted-foreground">Awaiting review</p>
         </Card>
 
-        <Card className="glass-card p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Monthly Income</p>
-              <h2 className="text-2xl font-bold">$8,350.00</h2>
-            </div>
-            <div className="p-2 bg-blue-100 rounded-full">
-              <DollarSign className="h-4 w-4 text-blue-600" />
-            </div>
+        <Card className="p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Clock className="h-5 w-5 text-blue-500" />
+            <h2 className="text-xl font-semibold">Ongoing</h2>
           </div>
+          <div className="text-3xl font-bold mb-2">{projectsByStatus.ongoing.length}</div>
+          <p className="text-sm text-muted-foreground">In progress</p>
         </Card>
 
-        <Card className="glass-card p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Monthly Expenses</p>
-              <h2 className="text-2xl font-bold">$3,628.00</h2>
-            </div>
-            <div className="p-2 bg-red-100 rounded-full">
-              <ArrowDownRight className="h-4 w-4 text-red-600" />
-            </div>
+        <Card className="p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <CheckCircle2 className="h-5 w-5 text-green-500" />
+            <h2 className="text-xl font-semibold">Completed</h2>
           </div>
+          <div className="text-3xl font-bold mb-2">{projectsByStatus.finished.length}</div>
+          <p className="text-sm text-muted-foreground">Successfully delivered</p>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="glass-card p-6 lg:col-span-2">
-          <h3 className="text-lg font-semibold mb-4">Spending Overview</h3>
-          <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data}>
-                <XAxis dataKey="name" stroke="#888888" />
-                <YAxis stroke="#888888" />
-                <Tooltip />
-                <Line
-                  type="monotone"
-                  dataKey="value"
-                  stroke="#8989DE"
-                  strokeWidth={2}
-                  dot={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+      {/* Recent Projects */}
+      <section className="space-y-4">
+        <h2 className="text-2xl font-semibold">Recent Projects</h2>
+        <Card className="divide-y">
+          {recentProjects.map((project) => (
+            <div key={project.id} className="p-4 flex items-center justify-between">
+              <div>
+                <h3 className="font-medium">{project.name}</h3>
+                <p className="text-sm text-muted-foreground">{project.client_name}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className={`px-2 py-1 rounded-full text-sm ${
+                  project.status === "proposal" ? "bg-yellow-100 text-yellow-800" :
+                  project.status === "ongoing" ? "bg-blue-100 text-blue-800" :
+                  "bg-green-100 text-green-800"
+                }`}>
+                  {project.status}
+                </span>
+              </div>
+            </div>
+          ))}
         </Card>
+      </section>
 
-        <Card className="glass-card p-6">
-          <h3 className="text-lg font-semibold mb-4">Recent Transactions</h3>
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-muted rounded-full">
-                    <PieChart className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <p className="font-medium">Shopping</p>
-                    <p className="text-sm text-muted-foreground">2 hours ago</p>
-                  </div>
+      {/* Urgent Projects */}
+      {urgentProjects.length > 0 && (
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold">Needs Attention</h2>
+          <Card className="divide-y">
+            {urgentProjects.map((project) => (
+              <div key={project.id} className="p-4 flex items-center justify-between">
+                <div>
+                  <h3 className="font-medium">{project.name}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Started {new Date(project.start_date || "").toLocaleDateString()}
+                  </p>
                 </div>
-                <p className="font-medium text-red-500">-$150.00</p>
+                <Button variant="outline" asChild>
+                  <Link to={`/projects?id=${project.id}`}>
+                    View Project
+                  </Link>
+                </Button>
               </div>
             ))}
-          </div>
-        </Card>
-      </div>
+          </Card>
+        </section>
+      )}
     </div>
   );
 };
