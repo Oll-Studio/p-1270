@@ -42,6 +42,7 @@ export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) 
   });
 
   const onSubmit = async (data: ProjectBriefFormValues) => {
+    if (isSubmitting) return; // Prevent multiple submissions
     console.log("Form submitted with data:", data);
     setIsSubmitting(true);
 

@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@supabase/auth-helpers-react";
 import * as z from "zod";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 const agencyFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -25,6 +27,7 @@ interface CreateAgencyDialogProps {
 export function CreateAgencyDialog({ open, onOpenChange }: CreateAgencyDialogProps) {
   const { toast } = useToast();
   const session = useSession();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<AgencyFormValues>({
     resolver: zodResolver(agencyFormSchema),
@@ -35,6 +38,7 @@ export function CreateAgencyDialog({ open, onOpenChange }: CreateAgencyDialogPro
   });
 
   const onSubmit = async (data: AgencyFormValues) => {
+    console.log("Submitting agency form with data:", data);
     if (!session?.user?.id) {
       toast({
         title: "Error",
@@ -44,29 +48,36 @@ export function CreateAgencyDialog({ open, onOpenChange }: CreateAgencyDialogPro
       return;
     }
 
-    const { error } = await supabase.from("agencies").insert({
-      name: data.name,
-      description: data.description,
-      created_by: session.user.id,
-    });
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.from("agencies").insert({
+        name: data.name,
+        description: data.description,
+        created_by: session.user.id,
+      });
 
-    if (error) {
-      console.error('Error creating agency:', error);
+      if (error) {
+        console.error('Error creating agency:', error);
+        throw error;
+      }
+
+      toast({
+        title: "Success",
+        description: "Agency created successfully",
+      });
+      
+      onOpenChange(false);
+      form.reset();
+    } catch (error) {
+      console.error('Error in form submission:', error);
       toast({
         title: "Error",
         description: "Failed to create agency. Please try again.",
         variant: "destructive",
       });
-      return;
+    } finally {
+      setIsSubmitting(false);
     }
-
-    toast({
-      title: "Success",
-      description: "Agency created successfully",
-    });
-    
-    onOpenChange(false);
-    form.reset();
   };
 
   return (
@@ -111,10 +122,19 @@ export function CreateAgencyDialog({ open, onOpenChange }: CreateAgencyDialogPro
             />
 
             <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => onOpenChange(false)}>
+              <Button variant="outline" onClick={() => onOpenChange(false)} type="button">
                 Cancel
               </Button>
-              <Button type="submit">Create Agency</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  'Create Agency'
+                )}
+              </Button>
             </div>
           </form>
         </Form>
