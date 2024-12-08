@@ -9,7 +9,7 @@ import { useState } from "react";
 
 const Projects = () => {
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false);
-  const { data: projects } = useQuery({
+  const { data: projects, refetch } = useQuery({
     queryKey: ["projects"],
     queryFn: async () => {
       const { data, error } = await supabase.from("projects").select("*");
@@ -17,6 +17,35 @@ const Projects = () => {
       return data;
     },
   });
+
+  const handleStatusChange = async (projectId: string, newStatus: string) => {
+    const { error } = await supabase
+      .from("projects")
+      .update({ proposal_status: newStatus })
+      .eq("id", projectId);
+
+    if (error) {
+      console.error('Error updating status:', error);
+      return;
+    }
+
+    // If the proposal is approved, create a new project
+    if (newStatus === 'approved') {
+      const project = projects?.find(p => p.id === projectId);
+      if (project) {
+        const { error: projectError } = await supabase
+          .from("projects")
+          .update({ status: 'planning' })
+          .eq("id", projectId);
+
+        if (projectError) {
+          console.error('Error creating project:', projectError);
+        }
+      }
+    }
+
+    refetch();
+  };
 
   const stats = {
     total: projects?.length || 0,
@@ -90,8 +119,10 @@ const Projects = () => {
               <TableRow>
                 <TableHead>Project Name</TableHead>
                 <TableHead>Client</TableHead>
+                <TableHead>Budget Range</TableHead>
                 <TableHead>Submitted Date</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -99,11 +130,32 @@ const Projects = () => {
                 <TableRow key={project.id}>
                   <TableCell>{project.name}</TableCell>
                   <TableCell>{project.client_name}</TableCell>
+                  <TableCell>{project.budget_range}</TableCell>
                   <TableCell>{new Date(project.created_at).toLocaleDateString()}</TableCell>
                   <TableCell>
-                    <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
-                      Pending Review
+                    <span className={cn(
+                      "px-2 py-1 rounded-full text-sm",
+                      project.proposal_status === "requested" && "bg-yellow-100 text-yellow-800",
+                      project.proposal_status === "on development" && "bg-blue-100 text-blue-800",
+                      project.proposal_status === "on approval" && "bg-purple-100 text-purple-800",
+                      project.proposal_status === "declined" && "bg-red-100 text-red-800",
+                      project.proposal_status === "approved" && "bg-green-100 text-green-800",
+                    )}>
+                      {project.proposal_status}
                     </span>
+                  </TableCell>
+                  <TableCell>
+                    <select
+                      className="border rounded p-1 bg-background"
+                      value={project.proposal_status}
+                      onChange={(e) => handleStatusChange(project.id, e.target.value)}
+                    >
+                      <option value="requested">Requested</option>
+                      <option value="on development">On Development</option>
+                      <option value="on approval">On Approval</option>
+                      <option value="declined">Declined</option>
+                      <option value="approved">Approved</option>
+                    </select>
                   </TableCell>
                 </TableRow>
               ))}
@@ -173,6 +225,7 @@ const Projects = () => {
           </Table>
         </Card>
       </section>
+
       <NewProjectDialog 
         open={showNewProjectDialog} 
         onOpenChange={setShowNewProjectDialog} 

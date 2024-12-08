@@ -86,6 +86,7 @@ export type Database = {
       projects: {
         Row: {
           agency_id: string
+          budget_range: string | null
           client_name: string | null
           completion_date: string | null
           created_at: string
@@ -93,12 +94,14 @@ export type Database = {
           description: string | null
           id: string
           name: string
+          proposal_status: string | null
           start_date: string | null
           status: string | null
           updated_at: string
         }
         Insert: {
           agency_id: string
+          budget_range?: string | null
           client_name?: string | null
           completion_date?: string | null
           created_at?: string
@@ -106,12 +109,14 @@ export type Database = {
           description?: string | null
           id?: string
           name: string
+          proposal_status?: string | null
           start_date?: string | null
           status?: string | null
           updated_at?: string
         }
         Update: {
           agency_id?: string
+          budget_range?: string | null
           client_name?: string | null
           completion_date?: string | null
           created_at?: string
@@ -119,6 +124,7 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          proposal_status?: string | null
           start_date?: string | null
           status?: string | null
           updated_at?: string

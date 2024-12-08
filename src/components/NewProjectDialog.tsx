@@ -12,6 +12,7 @@ import { ProjectTypeSelect } from "./project-form/ProjectTypeSelect";
 import { HelpTypeSelect } from "./project-form/HelpTypeSelect";
 import { FileUpload } from "./project-form/FileUpload";
 import { DeadlinePicker } from "./project-form/DeadlinePicker";
+import { BudgetRangeSelect } from "./project-form/BudgetRangeSelect";
 import { projectBriefFormSchema, type ProjectBriefFormValues } from "./project-form/types";
 
 interface NewProjectDialogProps {
@@ -31,6 +32,7 @@ export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) 
       goals: "",
       helpType: "I'd like to discuss project possibilities",
       description: "",
+      budgetRange: "Under $5,000",
       deadline: "",
       files: [],
     },
@@ -71,6 +73,8 @@ export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) 
       client_name: null,
       start_date: null,
       completion_date: new Date(data.deadline).toISOString(),
+      budget_range: data.budgetRange,
+      proposal_status: "requested",
     });
 
     if (error) {
@@ -155,6 +159,7 @@ export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) 
               )}
             />
 
+            <BudgetRangeSelect form={form} />
             <FileUpload form={form} />
             <DeadlinePicker form={form} />
 
