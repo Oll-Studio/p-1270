@@ -18,13 +18,13 @@ const Sidebar = () => {
   const location = useLocation();
 
   return (
-    <div className="fixed left-0 top-0 h-full w-64 bg-card border-r border-border">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-card border-r border-border z-30">
       <div className="flex flex-col h-full">
         <div className="p-6">
           <h2 className="text-2xl font-bold text-primary">Finance</h2>
         </div>
         
-        <nav className="flex-1 px-4">
+        <nav className="flex-1 px-4 overflow-y-auto">
           <ul className="space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
@@ -49,7 +49,7 @@ const Sidebar = () => {
           </ul>
         </nav>
 
-        <div className="p-4 mt-auto">
+        <div className="p-4 mt-auto border-t border-border">
           <div className="flex items-center gap-3 px-4 py-3">
             <User className="h-8 w-8 rounded-full bg-accent p-1" />
             <div className="flex flex-col">
@@ -59,7 +59,7 @@ const Sidebar = () => {
           </div>
         </div>
       </div>
-    </div>
+    </aside>
   );
 };
 

@@ -27,21 +27,25 @@ function App() {
         <Router>
           <div className="flex h-screen bg-background">
             <Sidebar />
-            <main className="flex-1 overflow-auto p-8">
-              <Routes>
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/signin" element={<SignIn />} />
-                <Route path="/" element={<Index />} />
-                <Route path="/workspaces" element={<Workspaces />} />
-                <Route path="/projects" element={<Projects />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/analytics" element={<Analytics />} />
-                <Route path="/notifications" element={<Notifications />} />
-                <Route path="/transactions" element={<Transactions />} />
-                <Route path="/users" element={<Users />} />
-              </Routes>
-            </main>
+            <div className="flex-1 pl-64">
+              <main className="h-full overflow-y-auto">
+                <div className="container mx-auto p-8">
+                  <Routes>
+                    <Route path="/signup" element={<SignUp />} />
+                    <Route path="/signin" element={<SignIn />} />
+                    <Route path="/" element={<Index />} />
+                    <Route path="/workspaces" element={<Workspaces />} />
+                    <Route path="/projects" element={<Projects />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/settings" element={<Settings />} />
+                    <Route path="/analytics" element={<Analytics />} />
+                    <Route path="/notifications" element={<Notifications />} />
+                    <Route path="/transactions" element={<Transactions />} />
+                    <Route path="/users" element={<Users />} />
+                  </Routes>
+                </div>
+              </main>
+            </div>
           </div>
           <Toaster />
         </Router>
