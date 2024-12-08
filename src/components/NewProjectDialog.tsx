@@ -1,43 +1,18 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@supabase/auth-helpers-react";
-
-const projectTypes = [
-  "Website Development",
-  "Mobile App",
-  "Branding",
-  "UI/UX Design",
-  "Marketing Campaign",
-  "E-commerce",
-  "Content Creation",
-  "Social Media",
-] as const;
-
-const helpTypes = [
-  "I'd like to discuss project possibilities",
-  "Create something new",
-  "Revamp, refine, or edit some existing project",
-] as const;
-
-const formSchema = z.object({
-  name: z.string().min(2, "Project name must be at least 2 characters"),
-  type: z.enum(projectTypes),
-  goals: z.string().min(10, "Please provide more detail about your goals"),
-  helpType: z.enum(helpTypes),
-  description: z.string().min(20, "Please provide a more detailed description"),
-  deadline: z.string().min(1, "Please provide a deadline"),
-});
-
-type ProjectBriefForm = z.infer<typeof formSchema>;
+import { ProjectTypeSelect } from "./project-form/ProjectTypeSelect";
+import { HelpTypeSelect } from "./project-form/HelpTypeSelect";
+import { FileUpload } from "./project-form/FileUpload";
+import { DeadlinePicker } from "./project-form/DeadlinePicker";
+import { projectBriefFormSchema, type ProjectBriefFormValues } from "./project-form/types";
 
 interface NewProjectDialogProps {
   open: boolean;
@@ -48,19 +23,20 @@ export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) 
   const { toast } = useToast();
   const session = useSession();
 
-  const form = useForm<ProjectBriefForm>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<ProjectBriefFormValues>({
+    resolver: zodResolver(projectBriefFormSchema),
     defaultValues: {
       name: "",
-      type: projectTypes[0],
+      type: "Website Development",
       goals: "",
-      helpType: helpTypes[0],
+      helpType: "I'd like to discuss project possibilities",
       description: "",
       deadline: "",
+      files: [],
     },
   });
 
-  const onSubmit = async (data: ProjectBriefForm) => {
+  const onSubmit = async (data: ProjectBriefFormValues) => {
     if (!session?.user?.id) {
       toast({
         title: "Error",
@@ -92,7 +68,7 @@ export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) 
       status: "proposal",
       created_by: session.user.id,
       agency_id: agencyMember.agency_id,
-      client_name: null, // We can add this later if needed
+      client_name: null,
       start_date: null,
       completion_date: new Date(data.deadline).toISOString(),
     });
@@ -139,30 +115,7 @@ export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) 
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Project Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select project type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {projectTypes.map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <ProjectTypeSelect form={form} />
 
             <FormField
               control={form.control}
@@ -182,30 +135,7 @@ export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) 
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="helpType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>How can we help?</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select how we can help" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {helpTypes.map((type) => (
-                        <SelectItem key={type} value={type}>
-                          {type}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <HelpTypeSelect form={form} />
 
             <FormField
               control={form.control}
@@ -225,19 +155,8 @@ export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) 
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="deadline"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Project Deadline</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <FileUpload form={form} />
+            <DeadlinePicker form={form} />
 
             <div className="flex justify-end space-x-2">
               <Button variant="outline" onClick={() => onOpenChange(false)}>

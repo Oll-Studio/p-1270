@@ -5,8 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { ArrowRight, Clock, CheckCircle2, AlertCircle, Loader2, DollarSign, CreditCard, Calendar, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { NewProjectDialog } from "@/components/NewProjectDialog";
 
 const Index = () => {
+  const [showNewProjectDialog, setShowNewProjectDialog] = useState(false);
   const { data: projects, isLoading } = useQuery({
     queryKey: ["projects"],
     queryFn: async () => {
@@ -202,11 +205,9 @@ const Index = () => {
       <section>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Example Projects</h2>
-          <Button asChild>
-            <Link to="/projects/new">
-              <Plus className="mr-2 h-4 w-4" />
-              Start New Project
-            </Link>
+          <Button onClick={() => setShowNewProjectDialog(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Start New Project
           </Button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -227,6 +228,10 @@ const Index = () => {
           ))}
         </div>
       </section>
+      <NewProjectDialog 
+        open={showNewProjectDialog} 
+        onOpenChange={setShowNewProjectDialog} 
+      />
     </div>
   );
 };
