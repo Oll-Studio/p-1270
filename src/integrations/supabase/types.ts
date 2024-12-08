@@ -86,29 +86,41 @@ export type Database = {
       projects: {
         Row: {
           agency_id: string
+          client_name: string | null
+          completion_date: string | null
           created_at: string
           created_by: string
           description: string | null
           id: string
           name: string
+          start_date: string | null
+          status: string | null
           updated_at: string
         }
         Insert: {
           agency_id: string
+          client_name?: string | null
+          completion_date?: string | null
           created_at?: string
           created_by: string
           description?: string | null
           id?: string
           name: string
+          start_date?: string | null
+          status?: string | null
           updated_at?: string
         }
         Update: {
           agency_id?: string
+          client_name?: string | null
+          completion_date?: string | null
           created_at?: string
           created_by?: string
           description?: string | null
           id?: string
           name?: string
+          start_date?: string | null
+          status?: string | null
           updated_at?: string
         }
         Relationships: [
