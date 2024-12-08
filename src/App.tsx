@@ -12,6 +12,7 @@ import Settings from "@/pages/Settings";
 import Analytics from "@/pages/Analytics";
 import Notifications from "@/pages/Notifications";
 import Transactions from "@/pages/Transactions";
+import Dashboard from "@/pages/Dashboard";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ function App() {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/" element={<Index />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/analytics" element={<Analytics />} />
