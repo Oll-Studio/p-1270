@@ -24,7 +24,7 @@ const SignUp = () => {
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event: AuthChangeEvent, session) => {
-        if (event === "SIGNED_IN" || event === "SIGNED_UP") {
+        if (event === "SIGNED_IN") {
           toast({
             title: "Welcome!",
             description: "You have successfully signed up.",
