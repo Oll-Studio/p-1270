@@ -4,7 +4,7 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { AuthChangeEvent } from "@supabase/supabase-js";
+import { AuthChangeEvent, Session } from "@supabase/supabase-js";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ const SignUp = () => {
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event: AuthChangeEvent, session) => {
+      (event: AuthChangeEvent, session: Session | null) => {
         if (event === "SIGNED_IN") {
           toast({
             title: "Welcome!",
@@ -66,7 +66,7 @@ const SignUp = () => {
             },
           }}
           theme="light"
-          providers={[]}
+          providers={["google"]}
           redirectTo={`${window.location.origin}/`}
           onlyThirdPartyProviders={false}
           view="sign_up"
