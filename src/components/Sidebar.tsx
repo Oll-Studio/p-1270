@@ -1,6 +1,9 @@
-import { Home, PieChart, Settings, User, CreditCard, Bell, Building2, FolderKanban } from "lucide-react";
+import { Home, PieChart, Settings, User, CreditCard, Bell, Building2, FolderKanban, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const menuItems = [
   { icon: Home, label: "Home", path: "/" },
@@ -15,6 +18,20 @@ const menuItems = [
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      toast.success("Logged out successfully");
+      navigate("/signin");
+    } catch (error) {
+      console.error("Error logging out:", error);
+      toast.error("Failed to log out");
+    }
+  };
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-card border-r border-border z-30">
@@ -51,10 +68,19 @@ const Sidebar = () => {
         <div className="p-4 mt-auto border-t border-border">
           <div className="flex items-center gap-3 px-4 py-3">
             <User className="h-8 w-8 rounded-full bg-accent p-1" />
-            <div className="flex flex-col">
+            <div className="flex flex-col flex-1">
               <span className="text-sm font-medium">John Doe</span>
               <span className="text-xs text-secondary">Premium User</span>
             </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleLogout}
+              className="ml-auto"
+              title="Logout"
+            >
+              <LogOut className="h-5 w-5" />
+            </Button>
           </div>
         </div>
       </div>
