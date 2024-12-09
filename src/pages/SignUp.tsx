@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { AuthChangeEvent } from "@supabase/supabase-js";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -22,8 +23,8 @@ const SignUp = () => {
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === "SIGNED_UP" || event === "SIGNED_IN") {
+      (event: AuthChangeEvent, session) => {
+        if (event === "SIGNED_IN" || event === "SIGNED_UP") {
           toast({
             title: "Welcome!",
             description: "You have successfully signed up.",
