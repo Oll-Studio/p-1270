@@ -16,6 +16,7 @@ import { BudgetRangeSelect } from "./project-form/BudgetRangeSelect";
 import { projectBriefFormSchema, type ProjectBriefFormValues } from "./project-form/types";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface NewProjectDialogProps {
   open: boolean;
@@ -26,6 +27,7 @@ export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) 
   const { toast } = useToast();
   const session = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const queryClient = useQueryClient();
 
   const form = useForm<ProjectBriefFormValues>({
     resolver: zodResolver(projectBriefFormSchema),
@@ -90,6 +92,9 @@ export function NewProjectDialog({ open, onOpenChange }: NewProjectDialogProps) 
         console.error('Error creating project:', projectError);
         throw projectError;
       }
+
+      // Invalidate and refetch projects query to update the list
+      await queryClient.invalidateQueries({ queryKey: ["projects"] });
 
       toast({
         title: "Success",

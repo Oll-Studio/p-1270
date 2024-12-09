@@ -11,6 +11,7 @@ import { useSession } from "@supabase/auth-helpers-react";
 import * as z from "zod";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 const agencyFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -28,6 +29,7 @@ export function CreateAgencyDialog({ open, onOpenChange }: CreateAgencyDialogPro
   const { toast } = useToast();
   const session = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const queryClient = useQueryClient();
 
   const form = useForm<AgencyFormValues>({
     resolver: zodResolver(agencyFormSchema),
@@ -38,7 +40,9 @@ export function CreateAgencyDialog({ open, onOpenChange }: CreateAgencyDialogPro
   });
 
   const onSubmit = async (data: AgencyFormValues) => {
+    if (isSubmitting) return; // Prevent multiple submissions
     console.log("Submitting agency form with data:", data);
+    
     if (!session?.user?.id) {
       toast({
         title: "Error",
@@ -60,6 +64,9 @@ export function CreateAgencyDialog({ open, onOpenChange }: CreateAgencyDialogPro
         console.error('Error creating agency:', error);
         throw error;
       }
+
+      // Invalidate and refetch agencies query to update the list
+      await queryClient.invalidateQueries({ queryKey: ["agencies"] });
 
       toast({
         title: "Success",
