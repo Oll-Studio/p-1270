@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
@@ -23,7 +24,7 @@ const SignUp = () => {
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event: AuthChangeEvent, session) => {
-        if (event === "USER_SIGNED_IN" || event === "USER_SIGNED_UP") {
+        if (event === "SIGNED_IN" || event === "SIGNED_UP") {
           toast({
             title: "Welcome!",
             description: "You have successfully signed up.",
