@@ -25,25 +25,130 @@ function App() {
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <Router>
           <div className="flex h-screen bg-background">
-            <Sidebar />
-            <div className="flex-1 pl-64">
-              <main className="h-full overflow-y-auto">
-                <div className="container mx-auto p-8">
-                  <Routes>
-                    <Route path="/signup" element={<SignUp />} />
-                    <Route path="/signin" element={<SignIn />} />
-                    <Route path="/" element={<Index />} />
-                    <Route path="/workspaces" element={<Workspaces />} />
-                    <Route path="/projects" element={<Projects />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/settings" element={<Settings />} />
-                    <Route path="/analytics" element={<Analytics />} />
-                    <Route path="/notifications" element={<Notifications />} />
-                    <Route path="/transactions" element={<Transactions />} />
-                  </Routes>
-                </div>
-              </main>
-            </div>
+            <Routes>
+              <Route path="/signup" element={<SignIn />} />
+              <Route path="/signin" element={<SignIn />} />
+              <Route
+                path="/"
+                element={
+                  <>
+                    <Sidebar />
+                    <div className="flex-1 pl-64">
+                      <main className="h-full overflow-y-auto">
+                        <div className="container mx-auto p-8">
+                          <Index />
+                        </div>
+                      </main>
+                    </div>
+                  </>
+                }
+              />
+              <Route
+                path="/workspaces"
+                element={
+                  <>
+                    <Sidebar />
+                    <div className="flex-1 pl-64">
+                      <main className="h-full overflow-y-auto">
+                        <div className="container mx-auto p-8">
+                          <Workspaces />
+                        </div>
+                      </main>
+                    </div>
+                  </>
+                }
+              />
+              <Route
+                path="/projects"
+                element={
+                  <>
+                    <Sidebar />
+                    <div className="flex-1 pl-64">
+                      <main className="h-full overflow-y-auto">
+                        <div className="container mx-auto p-8">
+                          <Projects />
+                        </div>
+                      </main>
+                    </div>
+                  </>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <>
+                    <Sidebar />
+                    <div className="flex-1 pl-64">
+                      <main className="h-full overflow-y-auto">
+                        <div className="container mx-auto p-8">
+                          <Profile />
+                        </div>
+                      </main>
+                    </div>
+                  </>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <>
+                    <Sidebar />
+                    <div className="flex-1 pl-64">
+                      <main className="h-full overflow-y-auto">
+                        <div className="container mx-auto p-8">
+                          <Settings />
+                        </div>
+                      </main>
+                    </div>
+                  </>
+                }
+              />
+              <Route
+                path="/analytics"
+                element={
+                  <>
+                    <Sidebar />
+                    <div className="flex-1 pl-64">
+                      <main className="h-full overflow-y-auto">
+                        <div className="container mx-auto p-8">
+                          <Analytics />
+                        </div>
+                      </main>
+                    </div>
+                  </>
+                }
+              />
+              <Route
+                path="/notifications"
+                element={
+                  <>
+                    <Sidebar />
+                    <div className="flex-1 pl-64">
+                      <main className="h-full overflow-y-auto">
+                        <div className="container mx-auto p-8">
+                          <Notifications />
+                        </div>
+                      </main>
+                    </div>
+                  </>
+                }
+              />
+              <Route
+                path="/transactions"
+                element={
+                  <>
+                    <Sidebar />
+                    <div className="flex-1 pl-64">
+                      <main className="h-full overflow-y-auto">
+                        <div className="container mx-auto p-8">
+                          <Transactions />
+                        </div>
+                      </main>
+                    </div>
+                  </>
+                }
+              />
+            </Routes>
           </div>
           <Toaster />
         </Router>
