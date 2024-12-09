@@ -12,7 +12,6 @@ const menuItems = [
   { icon: PieChart, label: "Analytics", path: "/analytics" },
   { icon: CreditCard, label: "Transactions", path: "/transactions" },
   { icon: Bell, label: "Notifications", path: "/notifications" },
-  { icon: User, label: "Profile", path: "/profile" },
   { icon: Settings, label: "Settings", path: "/settings" },
 ];
 
@@ -31,6 +30,10 @@ const Sidebar = () => {
       console.error("Error logging out:", error);
       toast.error("Failed to log out");
     }
+  };
+
+  const handleProfileClick = () => {
+    navigate("/profile");
   };
 
   return (
@@ -67,7 +70,15 @@ const Sidebar = () => {
 
         <div className="p-4 mt-auto border-t border-border">
           <div className="flex items-center gap-3 px-4 py-3">
-            <User className="h-8 w-8 rounded-full bg-accent p-1" />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={handleProfileClick}
+              className="mr-2"
+              title="Profile"
+            >
+              <User className="h-8 w-8 rounded-full bg-accent p-1" />
+            </Button>
             <div className="flex flex-col flex-1">
               <span className="text-sm font-medium">John Doe</span>
               <span className="text-xs text-secondary">Premium User</span>
